@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Login</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            width: 320px;
+            margin: 100px auto;
+            background: white;
+            padding: 25px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 95%;
+            padding: 8px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #errorMsg {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+    <h2>User Login</h2>
+
+    <label>Username:</label>
+    <input type="text" id="username" placeholder="Enter Username">
+
+    <label>Password:</label>
+    <input type="password" id="password" placeholder="Enter Password">
+
+    <button onclick="login()">Login</button>
+
+    <p id="errorMsg"></p>
+</div>
+
+<script>
+function login() {
+
+    const loginData = {
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value
+    };
+
+    fetch("http://localhost:8083/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginData)
+    })
+    .then(async response => {
+        if (!response.ok) {
+            document.getElementById("errorMsg").innerText = "Invalid username or password!";
+            return;
+        }
+
+        // Server returns STRING, not JSON → so use text()
+        let message = await response.text();
+
+        alert("Login Successful!");
+
+        window.location.href = "user-dashboard.html";
+    })
+    .catch(err => {
+        console.log(err);
+        document.getElementById("errorMsg").innerText = "Server error!";
+    });
+}
+</script>
+
+</body>
+</html>

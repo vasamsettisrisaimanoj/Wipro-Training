@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard - Songs</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            margin: 10px auto;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            margin-left: 5px;
+        }
+
+        .btn:hover { background-color: #45a049; }
+
+        .search-input {
+            padding: 10px;
+            width: 40%;
+            border-radius: 5px;
+            border: 1px solid #aaa;
+            font-size: 15px;
+        }
+
+        .table-container {
+            width: 80%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        tr:hover { background-color: #f7f7f7; }
+
+        .logout-btn {
+            margin: 30px auto;
+            display: block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout-btn:hover { background-color: #45a049; }
+    </style>
+</head>
+
+<body>
+
+<h2>User Dashboard - Songs</h2>
+
+<div class="container">
+    <input class="search-input" type="text" id="searchBox" placeholder="Search by name, album, singer">
+
+    <button class="btn" onclick="searchSongs()">Search</button>
+    <button class="btn" onclick="loadSongs()">Reset</button>
+    <button class="btn" onclick="window.location.href='playlist-dashboard.html'">My Playlists</button>
+</div>
+
+<div class="table-container">
+    <h3>Available Songs</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Song Name</th>
+                <th>Album</th>
+                <th>Singer</th>
+                <th>Music Director</th>
+                <th>Add</th>
+            </tr>
+        </thead>
+
+        <tbody id="songTableBody"></tbody>
+    </table>
+</div>
+
+<button class="logout-btn" onclick="logout()">Logout</button>
+
+<script>
+
+const userId = 1;
+
+////////////////////////////////////////////////////
+// LOAD SONGS  (FIXED → now uses VISIBLE songs only)
+////////////////////////////////////////////////////
+function loadSongs() {
+    fetch("http://localhost:8082/api/admin/songs/public")   // ✔ FIXED API
+        .then(res => res.json())
+        .then(renderSongs);
+}
+
+function renderSongs(data) {
+    let body = document.getElementById("songTableBody");
+    body.innerHTML = "";
+
+    data.forEach(song => {
+        body.innerHTML += `
+            <tr>
+                <td>${song.id}</td>
+                <td>${song.name}</td>
+                <td>${song.album}</td>
+                <td>${song.singer}</td>
+                <td>${song.musicDirector}</td>
+                <td>
+                    <button class="btn" onclick="addSong(${song.id})">Add</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+////////////////////////////////////////////////////
+// SEARCH SONGS
+////////////////////////////////////////////////////
+function searchSongs() {
+    let keyword = document.getElementById("searchBox").value.trim();
+
+    if (!keyword) {
+        loadSongs();
+        return;
+    }
+
+    fetch(`http://localhost:8082/api/admin/songs/search?keyword=${keyword}`)
+        .then(res => res.json())
+        .then(renderSongs);
+}
+
+////////////////////////////////////////////////////
+// ADD TO PLAYLIST
+////////////////////////////////////////////////////
+function addSong(songId) {
+    alert("Choose a playlist in Playlist Dashboard. Redirecting...");
+    window.location.href = `playlist-dashboard.html?songId=${songId}`;
+}
+
+////////////////////////////////////////////////////
+// LOGOUT
+////////////////////////////////////////////////////
+function logout() {
+    window.location.href = "user-login.html";
+}
+
+////////////////////////////////////////////////////
+// INITIAL LOAD
+////////////////////////////////////////////////////
+window.onload = function() {
+    loadSongs();
+};
+
+</script>
+
+</body>
+</html>

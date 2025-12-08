@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>My Playlists</title>
+
+<style>
+    body { font-family: Arial; background:#f2f2f2; margin:0; padding:20px; }
+    h2, h3 { text-align:center; color:#333; }
+
+    .top-bar {
+        width:80%; margin:10px auto 25px auto;
+        display:flex; align-items:center; justify-content:space-between;
+    }
+
+    .left-side { flex:1; }
+    .left-side input {
+        width:100%; padding:12px; border-radius:6px; border:1px solid #bbb;
+        font-size:16px;
+    }
+
+    .right-side { display:flex; gap:12px; margin-left:20px; }
+
+    .btn { padding:10px 18px; border:none; border-radius:6px;
+           cursor:pointer; font-size:15px; color:white; }
+    .btn-blue { background:#007BFF; }
+    .btn-green { background:#4CAF50; }
+    .btn-red { background:#ff0000; }
+
+    .btn-small { padding:6px 14px; border-radius:5px;
+                 font-size:14px; cursor:pointer; color:white; }
+
+    .action-cell { text-align:right; padding-right:25px; }
+
+    .table-container {
+        width:80%; margin:20px auto; background:white; padding:20px;
+        border-radius:8px; border:1px solid #ccc;
+    }
+
+    table { width:100%; border-collapse:collapse; }
+    th { background:#4CAF50; color:white; padding:12px; font-size:16px; }
+    td { padding:12px; text-align:center; border-bottom:1px solid #ddd; }
+    tr:hover { background:#f5f5f5; }
+
+    .logout-btn { margin:30px auto; display:block; width:120px; }
+</style>
+</head>
+
+<body>
+
+<h2>My Playlists</h2>
+
+<div class="top-bar" 
+     style="width:80%; margin:10px auto 25px auto; display:flex; gap:20px; align-items:center;">
+
+    <input id="playlistName" 
+           placeholder="Enter Playlist Name"
+           style="flex:1; padding:12px; border-radius:6px; border:1px solid #bbb; font-size:16px;">
+
+    <button class="btn btn-green" onclick="createPlaylist()">Create Playlist</button>
+
+    <!-- Load My Playlists REMOVED -->
+
+    <button class="btn btn-blue" onclick="location.href='user-dashboard.html'">Back to Songs</button>
+</div>
+
+
+
+<div class="table-container">
+    <h3>Your Playlists</h3>
+    <table>
+        <thead>
+            <tr><th>Playlist ID</th><th>Name</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="playlistTableBody"></tbody>
+    </table>
+</div>
+
+<!-- SEARCH + ADD SONGS -->
+<div id="playlistTools" 
+     style="display:none; width:80%; margin:20px auto; display:flex; justify-content:flex-start; gap:20px;">
+
+    <input id="searchBox" 
+           placeholder="Search songs..." 
+           onkeyup="searchSongs()"
+           style="flex:1; padding:12px; border-radius:6px; border:1px solid #bbb; font-size:16px;">
+
+    <button class="btn btn-blue" 
+            onclick="openAddSongsMode()" 
+            style="white-space:nowrap;">
+        + Add Songs
+    </button>
+</div>
+
+
+<!-- PLAYLIST SONGS VIEW -->
+<div id="playlistSongsSection" class="table-container" style="display:none;">
+    <h3 id="playlistTitle"></h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Song ID</th><th>Name</th><th>Album</th><th>Singer</th>
+            </tr>
+        </thead>
+        <tbody id="playlistSongsTable"></tbody>
+    </table>
+</div>
+
+<!-- ADD SONGS MODE -->
+<div id="addSongsSection" class="table-container" style="display:none;">
+    <h3>Add Songs</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Song ID</th><th>Name</th><th>Album</th><th>Singer</th><th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="availableSongsTable"></tbody>
+    </table>
+
+    <button class="btn btn-green" onclick="saveSongs()">Save</button>
+</div>
+
+<button class="btn btn-green logout-btn" onclick="logout()">Logout</button>
+
+<script>
+const userId = 1;
+let activePlaylistId = null;
+let currentPlaylistName = "";
+let allSongsList = [];
+let tempSongs = [];
+
+// Load playlists
+function loadPlaylists() {
+    fetch(`http://localhost:8083/api/playlists/user/${userId}`)
+    .then(r => r.json())
+    .then(list => {
+        playlistTableBody.innerHTML = "";
+        list.forEach(p => {
+            playlistTableBody.innerHTML += `
+            <tr>
+                <td>${p.id}</td>
+                <td>${p.name}</td>
+                <td class="action-cell">
+                    <button class="btn-small btn-blue" onclick="openPlaylist(${p.id}, '${p.name}')">Open</button>
+                    <!-- Rename REMOVED -->
+                    <button class="btn-small btn-red" onclick="deletePlaylist(${p.id})">Delete</button>
+                </td>
+            </tr>`;
+        });
+    });
+}
+
+// Create playlist
+function createPlaylist() {
+    const name = playlistName.value.trim();
+    if (!name) return alert("Enter playlist name");
+
+    fetch(`http://localhost:8083/api/playlists/${userId}?name=${name}`, { method: "POST" })
+    .then(() => {
+        playlistName.value = "";
+        loadPlaylists();
+    });
+}
+
+// Open playlist
+function openPlaylist(id, name) {
+    activePlaylistId = id;
+    currentPlaylistName = name;
+
+    playlistTitle.innerText = `Songs in ${name}`;
+    playlistTools.style.display = "flex";
+    playlistSongsSection.style.display = "block";
+    addSongsSection.style.display = "none";
+
+    Promise.all([
+        fetch("http://localhost:8082/api/admin/songs").then(r => r.json()),
+        fetch(`http://localhost:8083/api/playlists/${id}/songs`).then(r => r.json())
+    ])
+    .then(([allSongs, playlistSongs]) => {
+        allSongsList = allSongs;
+        tempSongs = playlistSongs;
+        renderPlaylistView();
+    });
+}
+
+/* DELETE PLAYLIST */
+function deletePlaylist(id) {
+    if (!confirm("Are you sure you want to delete this playlist?")) return;
+
+    fetch(`http://localhost:8083/api/playlists/${id}`, {
+        method: "DELETE"
+    })
+    .then(r => r.text())
+    .then(msg => {
+        alert("Playlist deleted successfully!");
+        loadPlaylists();
+    })
+    .catch(err => {
+        console.error("DELETE ERROR:", err);
+        alert("Failed to delete playlist.");
+    });
+}
+
+// Render playlist songs
+function renderPlaylistView() {
+    playlistSongsTable.innerHTML = "";
+
+    tempSongs.forEach(song => {
+        playlistSongsTable.innerHTML += `
+        <tr>
+            <td>${song.id}</td>
+            <td>${song.name}</td>
+            <td>${song.album}</td>
+            <td>${song.singer}</td>
+        </tr>`;
+    });
+}
+
+// Open add songs
+function openAddSongsMode() {
+    playlistSongsSection.style.display = "none";
+    addSongsSection.style.display = "block";
+    renderAddSongsMode();
+}
+
+// Render add-only mode table
+function renderAddSongsMode() {
+    availableSongsTable.innerHTML = "";
+    const selectedIds = new Set(tempSongs.map(s => s.id));
+
+    allSongsList.forEach(song => {
+        const btn = selectedIds.has(song.id)
+            ? `<button class="btn-small btn-blue" disabled>Added</button>`
+            : `<button class="btn-small btn-green" onclick="addTemp(${song.id})">Add</button>`;
+
+        availableSongsTable.innerHTML += `
+        <tr>
+            <td>${song.id}</td>
+            <td>${song.name}</td>
+            <td>${song.album}</td>
+            <td>${song.singer}</td>
+            <td>${btn}</td>
+        </tr>`;
+    });
+}
+
+// Add temporarily
+function addTemp(songId) {
+    let s = allSongsList.find(x => x.id === songId);
+    if (!tempSongs.some(x => x.id === songId)) tempSongs.push(s);
+    renderAddSongsMode();
+    renderPlaylistView();
+}
+
+// SAVE SONGS
+function saveSongs() {
+    const newSongs = tempSongs;
+
+    Promise.all(
+        newSongs.map(song =>
+            fetch(`http://localhost:8083/api/playlists/${activePlaylistId}/songs/${song.id}`, {
+                method: "POST"
+            })
+        )
+    )
+    .then(() => {
+        alert("Songs added successfully!");
+        openPlaylist(activePlaylistId, currentPlaylistName);
+    });
+}
+
+// Search
+function searchSongs() {
+    let q = searchBox.value.toLowerCase();
+    let filtered = tempSongs.filter(s =>
+        s.name.toLowerCase().includes(q) ||
+        s.album.toLowerCase().includes(q) ||
+        s.singer.toLowerCase().includes(q)
+    );
+
+    playlistSongsTable.innerHTML = "";
+    filtered.forEach(song => {
+        playlistSongsTable.innerHTML += `
+        <tr>
+            <td>${song.id}</td>
+            <td>${song.name}</td>
+            <td>${song.album}</td>
+            <td>${song.singer}</td>
+        </tr>`;
+    });
+}
+
+function logout() {
+    location.href = "user-login.html";
+}
+
+window.onload = loadPlaylists;
+</script>
+
+</body>
+</html>

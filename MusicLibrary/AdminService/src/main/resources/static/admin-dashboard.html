@@ -1,0 +1,214 @@
+<!DOCTYPE html> 
+<html>
+<head>
+    <title>Admin Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .table-container {
+            width: 80%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        button {
+            margin: 25px auto;
+            display: block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .top-right-actions {
+            width: 80%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .logout-container {
+            text-align: center;
+        }
+    </style>
+
+</head>
+<body>
+
+<h2>Admin Dashboard</h2>
+
+<!-- Add Song button on RIGHT -->
+<div class="top-right-actions">
+    <button onclick="location.href='add-song.html'">+ Add New Song</button>
+</div>
+
+<!-- Songs Table -->
+<div class="table-container">
+    <h3>Songs List</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Song Name</th>
+                <th>Album</th>
+                <th>Singer</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody id="songsTable"></tbody>
+    </table>
+</div>
+
+<!-- Users Table -->
+<div class="table-container">
+    <h3>Users List</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+
+        <tbody id="usersTable"></tbody>
+    </table>
+</div>
+
+<div class="logout-container">
+    <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+function loadSongs() {
+    fetch("http://localhost:8082/api/admin/songs")
+        .then(response => response.json())
+        .then(data => {
+            const table = document.getElementById("songsTable");
+            table.innerHTML = "";
+
+            data.forEach(song => {
+                const row = `
+                    <tr>
+                        <td>${song.id}</td>
+                        <td>${song.name}</td>
+                        <td>${song.album}</td>
+                        <td>${song.singer}</td>
+
+                        <!-- UPDATED ACTIONS (Edit + Delete only) -->
+                        <td>
+                            <button onclick="editSong(${song.id})" style="background:orange;">Edit</button>
+                            <button onclick="deleteSong(${song.id})" style="background:red;">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                table.innerHTML += row;
+            });
+        });
+}
+
+function editSong(id) {
+    const newName = prompt("Enter new song name:");
+    if (!newName) return;
+
+    fetch(`http://localhost:8082/api/admin/songs/${id}`)
+        .then(r => r.json())
+        .then(song => {
+            song.name = newName;
+
+            fetch(`http://localhost:8082/api/admin/songs/${id}`, {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(song)
+            }).then(() => {
+                alert("Updated!");
+                loadSongs();
+            });
+        });
+}
+
+function deleteSong(id) {
+    if (!confirm("Are you sure?")) return;
+
+    fetch(`http://localhost:8082/api/admin/songs/${id}`, {
+        method: "DELETE"
+    }).then(() => {
+        alert("Deleted!");
+        loadSongs();
+    });
+}
+
+function loadUsers() {
+    fetch("http://localhost:8083/api/users/all")
+        .then(response => response.json())
+        .then(data => {
+            const table = document.getElementById("usersTable");
+            table.innerHTML = "";
+
+            data.forEach(user => {
+                const row = `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                    </tr>
+                `;
+                table.innerHTML += row;
+            });
+        });
+}
+
+function logout() {
+    alert("Logged out successfully!");
+    window.location.href = "admin-login.html";
+}
+
+window.onload = function() {
+    loadSongs();
+    loadUsers();
+};
+</script>
+
+</body>
+</html>

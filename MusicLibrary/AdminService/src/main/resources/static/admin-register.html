@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Registration</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            width: 320px;
+            margin: 100px auto;
+            background: white;
+            padding: 25px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 95%;
+            padding: 8px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background-color: #4CAF50; 
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+    <h2>Admin Registration</h2>
+
+    <form id="adminForm" onsubmit="event.preventDefault(); registerAdmin();">
+
+        <label>Username:</label>
+        <input type="text" id="username" required>
+
+        <label>Email:</label>
+        <input type="email" id="email" required>
+
+        <label>Password:</label>
+        <input type="password" id="password" required>
+
+        <button type="submit">Register Admin</button>
+    </form>
+
+    <h3 id="result"></h3>
+</div>
+
+<script>
+function registerAdmin() {
+    const adminData = {
+        username: document.getElementById("username").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value
+    };
+
+    fetch("http://localhost:8082/api/admins", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(adminData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Registration failed");
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById("result").style.color = "green";
+        document.getElementById("result").innerText = "Admin Registered Successfully!";
+
+        setTimeout(() => {
+            window.location.href = "admin-login.html";
+        }, 1200);
+    })
+    .catch(error => {
+        document.getElementById("result").style.color = "red";
+        document.getElementById("result").innerText = "Error: " + error.message;
+    });
+}
+</script>
+
+</body>
+</html>
