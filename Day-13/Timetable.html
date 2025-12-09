@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Student Portal - Sprint 2</title>
+    
+    <!-- This is our CSS section. We use Flexbox for layout and responsiveness. -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4; 
+            margin: 0;
+            padding: 0;
+           }
+
+        header {
+            background-color: #4a55a2; 
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        section {
+            display: flex;
+            gap: 10px; /* Space between menu items */
+        }
+        
+        section a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            background-color: #6a76c6; 
+            transition: background-color 0.3s;
+        }
+        .content {
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto;
+        }
+        #profile-view, #timetable-view {
+            display: none;
+        }
+        #profile-view:target, 
+        #timetable-view:target {
+            display: block;
+        }
+
+        #welcome-view {
+            display: block;
+        }
+    
+        .content-box {
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        #profile-view {
+            background-color: #ffe0b2; /* Light Orange/Peach */
+            border: 1px solid #ff9800; 
+        }
+        #timetable-view {
+            background-color: #e0f2f1; /* Light Teal */
+            border: 1px solid #009688;
+        }
+        .profile-info {
+            display: flex; 
+            flex-direction: column; /* Stack vertically on small screens */
+            align-items: center;
+            gap: 20px;
+        }
+        
+        @media (min-width: 600px) {
+            .profile-info {
+                flex-direction: row; /* Side-by-side on wider screens */
+                align-items: flex-start;
+            }
+        }
+
+        .student-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%; 
+            overflow: hidden;
+            border: 3px solid #ff9800;
+            flex-shrink: 0; 
+        }
+        
+        .student-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .info-detail {
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: white; 
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #b2dfdb;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #00897b; 
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & MENU (Reusable Component) -->
+    <header>
+        <div class="logo">Spring Flowers School</div>
+        <section>
+            <a href="#">Home</a>
+            <a href="#profile-view">Student Profile</a>
+            <a href="#timetable-view">Time Table</a> 
+        </section>
+    </header>
+
+    <!-- 2. MAIN CONTENT AREA -->
+    <div class="content">
+        <div id="timetable-view" class="content-box">
+            <h3 style="color: #009688; margin-top: 0;">My Weekly Time Table</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>9:00 - 10:00</td>
+                        <td>Maths</td>
+                        <td>Science</td>
+                        <td>English</td>
+                        <td>History</td>
+                        <td>Maths</td>
+                    </tr>
+                    <tr>
+                        <td>10:00 - 11:00</td>
+                        <td>Science</td>
+                        <td>History</td>
+                        <td>Art</td>
+                        <td>Maths</td>
+                        <td>Science</td>
+                    </tr>
+                    <tr>
+                        <td>11:00 - 12:00</td>
+                        <td>English</td>
+                        <td>Maths</td>
+                        <td>P.E.</td>
+                        <td>Science</td>
+                        <td>History</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- STUDENT PROFILE VIEW (From Sprint 1) -->
+        <div id="profile-view" class="content-box profile-box">
+            <h3 style="color: #d84315; margin-top: 0;">Student Profile</h3>
+
+            <div class="profile-info">
+                
+                <!-- Student Image -->
+                <div class="student-image">
+                    <img src="images/images.jpg" alt="Student Image">
+                </div>
+                
+                <!-- Student Information -->
+                <div>
+                    <h4 style="margin-top: 0; color: #333;">Student Information</h4>
+                    
+                    <div class="info-detail">
+                        <span class="info-label">Name:</span> 
+                        <span class="info-value">Manoj</span>
+                    </div>
+                    
+                    <div class="info-detail">
+                        <span class="info-label">ID:</span> 
+                        <span class="info-value">SF-450193</span>
+                    </div>
+
+                    <div class="info-detail">
+                        <span class="info-label">Grade:</span> 
+                        <span class="info-value">10th Grade</span>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- WELCOME PAGE VIEW (From Sprint 1, Visible by default) -->
+        <div id="welcome-view" class="content-box" style="background-color: white;">
+            <h3 style="color: #4a55a2; text-align: center; margin-top: 0;">Welcome Page</h3>
+            <p style="text-align: center;">You are currently on the Welcome page. Click **Student Profile** or **Time Table** in the blue bar above to see your details.</p>
+        </div>
+
+    </div>
+    
+
+</body>
+</html>

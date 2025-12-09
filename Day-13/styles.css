@@ -1,0 +1,23 @@
+.exhibit{
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 150px;
+    margin-right: 150px;
+}
+.gallery{
+    display: grid;
+    background-color: rgb(108, 115, 94);
+}
+*{
+    background-color: rgb(194, 189, 187);
+}
+img{
+    margin: 10px;
+}
+.exhibit:hover img{
+    transform :scale(1.1);
+}
+footer{
+    text-align: center;
+    margin: 20px;
+}
