@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Contact Manager</title>
+    
+    <style>
+        body {  
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #f4f4f9; 
+        }
+        h1 { color: #333; text-align: center; } 
+        .card { 
+            background: white; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+        }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+        }
+        button { 
+            background-color: #007bff; 
+            color: white; 
+            padding: 10px 15px; 
+        }
+        button:hover { background-color: #0056b3; }
+        
+        .contact-entry {
+            border-bottom: 1px solid ;
+            padding: 10px 0;
+        }
+        
+        
+    </style>
+</head>
+<body>
+
+    <h1>Contact Manager </h1>
+
+    <div class="card">
+        <h2>Add New Contact</h2>
+
+        <form id="contactForm">
+            <div>
+                <label for="name">Name (Required):</label>
+                <input type="text" id="name" required>
+            </div>
+            
+            <div>
+                <label for="phone">Phone Number(Required):</label>
+                <input type="tel" id="phone" required>
+            </div>
+            <button type="submit">Add Contact</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>My Saved Contacts</h2>
+        <div id="contactList">
+            <p>No contacts added yet.</p>
+        </div>
+    </div>
+
+    <script>
+        let contacts = []; 
+
+        const form = document.getElementById('contactForm');
+        const contactListDiv = document.getElementById('contactList');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); 
+
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+
+            const newContact = { name, phone };
+            contacts.push(newContact);
+
+            renderContactList();
+        });
+
+        function renderContactList() {
+            contactListDiv.innerHTML = ''; 
+
+            if (contacts.length === 0) {
+                contactListDiv.innerHTML = '<p>No contacts added yet.</p>';
+                return;
+            }
+
+            contacts.forEach(contact => {
+                const entry = document.createElement('div');
+                entry.className = 'contact-entry';
+                entry.innerHTML = `
+                    <strong>Name:</strong> ${contact.name}<br>
+                    <strong>Phone:</strong> ${contact.phone}<br>
+                `;
+                contactListDiv.appendChild(entry);
+            });
+        }
+    </script>
+
+</body>
+</html>
