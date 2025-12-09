@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <!--
+    Automate the report card to generate for students based on their marks in 3 subjects
+    Each Data is stored as an object and the entire class is an array of students.
+    1. add data type validation (where marks must be numbers or float not strings )
+    2. Validate the name as string
+    3. skip the invalid records or show warnings
+    4. compute and display the report with extra functionality like scholarship or allowance for high grade 
+    
+
+    let students = [
+    
+    {name : "" , marks :[45,67,78]},
+    {name : "" , marks :[45,"",78]},
+     {name : 234 , marks :[45,67,78]},  
+    ]
+
+    function isValidStudent(student)
+{
+    if(typeof student.name != "string"){
+    console.warn("Invalid name entered : " + student);
+    }
+}
+
+//validation for marks 
+
+function calculateAverage(marks)
+function getGrade(avg)
+
+function calculateTotalScholarship(grade)
+switch(grade)
+
+
+function generateReport(students)
+{
+display
+}
+    -->
+<script>
+    let students = [
+    {name : "Manoj" , marks :[45,67,78]},
+    {name : "Aditya" , marks :[45,88,78]},
+    {name : "Tony" , marks :[45,67,78]},  
+    ]
+    function isValidStudent(students){
+        if(typeof students.name != "string"){
+            console.warn("Invalid name entered : " + student);
+            return false;
+        }
+        for(let i=0;i<3;i++) {
+            if (typeof students.marks[i] !== "number") {
+                console.warn("Invalid mark entered for " + student.name + ": " + mark);
+                return false;
+            }
+        }
+        return true;
+    }
+    let temp = 0
+    function calculateAverage(marks){
+        
+        for(let i=0;i<3;i++){
+            temp += marks[i];
+        }
+        return temp/3;
+    }
+    function getGrade(avg){
+        for(let i=0;i<3;i++){
+            temp = students[i].avgMarks;
+            if(temp>85){
+                return "A";
+            }else if(temp>70){
+                return "B";
+            }else if(temp>55){
+                return "C";
+            }else if(temp>40){
+                return "D";
+            }else{
+                return "E";
+            }
+        }
+    }
+    function calculateTotalScholarship(grade){
+        switch(grade){
+            case "A": return 60;break;
+            case "B": return 40;break;
+            case "C": return 30;break;
+            default : return 0;break;
+        }
+    }
+    function generateReport(students){
+        
+        for(let i=0;i<3;i++){
+            
+            let avg = calculateAverage(students[i].marks);
+            let grade = getGrade(students[i][2]);
+            let scholarship = calculateTotalScholarship(students[i].grade);
+            console.log("Name of the Student: "+students[i][1]);
+            console.log("Average marks :"+avg);
+            console.log("Grade :"+grade);
+            console.log("scholarship of student :"+scholarship);
+        }
+    }
+    generateReport(students);
+    console.log(students[1].marks[0,1,2]);
+</script>
+</body>
+</html>
